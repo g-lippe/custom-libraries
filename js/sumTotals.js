@@ -25,6 +25,7 @@
  * -> nome_var / nome_var_soma: opicional, especificam nomes para os objetos do resultado
  *    ex: ao usar os valores 'name' e 'total':
  *    ao invés de {CIDADE: 'Jundiai', QUANT: 3} o resultado será {name: 'Jundiai', total: 3}
+ * -> contar_vazios: opcional, conta quantos registros não tem o campo preenchido
  * 
  * 
  * --------------------------------------------------
@@ -33,13 +34,14 @@
  * --------------------------------------------------
  */
 
-export function contarTotais(campo, array, porcentagem, nome_var, nome_var_soma) {
+export function contarTotais(campo, array, porcentagem, nome_var, nome_var_soma, contar_vazios) {
   var res_temp = {}
 
   // Valores padrão para variaveis opcionais
   if (!nome_var) { nome_var = campo }
   if (!nome_var_soma) { nome_var_soma = 'QUANT' }
   if (!porcentagem) { porcentagem = false }
+  if (!contar_vazios) {contar_vazios = false }
 
 
   // sort by name
@@ -67,6 +69,13 @@ export function contarTotais(campo, array, porcentagem, nome_var, nome_var_soma)
         [nome_var]: linha[campo],
         [nome_var_soma]: res_temp[linha[campo]] ? res_temp[linha[campo]].QUANT + 1 : 1
       }
+    } else {
+      if (contar_vazios) {
+        res_temp[linha[campo]] = {
+          [nome_var]: 'NÃO PREENCHIDO',
+          [nome_var_soma]: res_temp[linha[campo]] ? res_temp[linha[campo]].QUANT + 1 : 1
+        }
+      }
     }
   })
 
@@ -76,10 +85,9 @@ export function contarTotais(campo, array, porcentagem, nome_var, nome_var_soma)
 
     Object.keys(res_temp).map(item => (
       // console.log('item: ', item)
-      res_temp[item].POR = parseFloat(((res_temp[item][nome_var_soma] / length) * 100).toFixed(2))
+      res_temp[item].POR = parseFloat( ( (res_temp[item][nome_var_soma] / length) * 100 ).toFixed(2) )
     ))
   }
 
-  console.log(res_temp)
   return Object.values(res_temp)
 }
